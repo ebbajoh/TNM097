@@ -1,8 +1,7 @@
-
 clear; close all; 
 
 % read img
-img = im2double(imread('img/test-bild1.jpg'));
+img = im2double(imread('img/flowerImage.jpg'));
 
 % smoothing (reduces texture noise)
 img = imgaussfilt(img, 2);
@@ -33,8 +32,8 @@ counts = histcounts(idx, 1:K_initial+1);
 % Sort by dominance
 [~, sortedIdx] = sort(counts, 'descend');
 
-% Select 10 most dominant clusters
-K = 15;
+% Select 15 most dominant clusters
+K = 10;
 topK = sortedIdx(1:K);
 
 dominant_centers = centers(topK, :);
@@ -63,14 +62,16 @@ title('15 Most Dominant Colors')
 
 % remove small regions
 
-minSize = 2000;   
+% Justera radien vid behov (större värde = mer aggressiv borttagning)
+se = strel('disk', 5);   
 
 % create empty map
 clean_map = zeros(size(label_map));
 
+% Tar bort små strukturer baserat på geometrisk form (morfologisk opening)
 for k = 1:K
     mask = (label_map == k);
-    mask_clean = bwareaopen(mask, minSize);
+    mask_clean = imopen(mask, se);   % ersätter bwareaopen
     clean_map(mask_clean) = k;
 end
 
@@ -90,17 +91,15 @@ imshow(rgb_clean)
 title('After Removing Small Regions')
 
 
-% Hittar gränser mellan färgområden
+% Hittar gränser mellan färgområdenfff
 
 % Detect boundaries via label difference
 boundaries = false(h, w);
 
-boundaries(:,1:end-1) = ...
-    (clean_map(:,1:end-1) ~= clean_map(:,2:end));
+boundaries(:,1:end-1) = (clean_map(:,1:end-1) ~= clean_map(:,2:end));
 
-boundaries(1:end-1,:) = ...
-    boundaries(1:end-1,:) | ...
-    (clean_map(1:end-1,:) ~= clean_map(2:end,:));
+boundaries(1:end-1,:) = boundaries(1:end-1,:) | ...
+                        (clean_map(1:end-1,:) ~= clean_map(2:end,:));
 
 % Thin to single-pixel lines
 boundaries = bwmorph(boundaries, 'thin', 2);
@@ -111,4 +110,3 @@ outline(boundaries) = 0;
 figure
 imshow(outline)
 title('Final Clean Region Boundaries')
-
