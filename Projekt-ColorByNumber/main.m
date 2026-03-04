@@ -1,7 +1,7 @@
 clear; close all; 
 
 % read img
-img = im2double(imread('img/SabrinaImage.jpg'));
+img = im2double(imread('img/GrapeFruit.jpg'));
 
 % smoothing (reduces texture noise)
 img = imgaussfilt(img, 2);
@@ -96,3 +96,7 @@ imshow(outline)
 title('Final Clean Region Boundaries')
 
 createPaletteLegend(outline, centers, clean_map);
+
+palette_rgb = lab2rgb(centers);
+
+interactivePaint(outline, palette_rgb, clean_map);

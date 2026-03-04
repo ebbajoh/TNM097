@@ -1,11 +1,13 @@
 function createPaletteLegend(image_input, color_centers, label_map)
 
+% Convert grayscale to RGB if necessary
 if size(image_input,3) == 1
     image_input = repmat(image_input,[1 1 3]);
 end
 
 [h,w,~] = size(image_input);
 
+% Convert palette colors
 palette_rgb = lab2rgb(color_centers);
 palette_rgb = max(min(palette_rgb,1),0);
 
@@ -23,19 +25,24 @@ figure
 imshow(canvas)
 hold on
 
+%% --- Draw numbers inside regions ---
 for k = 1:num_colors
 
     mask = label_map == k;
-    stats = regionprops(mask,'Centroid','Area');
 
-    for i = 1:length(stats)
+    % find connected regions
+    CC = bwconncomp(mask);
 
-        if stats(i).Area < 50
-            continue
-        end
+    for i = 1:CC.NumObjects
 
-        cx = stats(i).Centroid(1);
-        cy = stats(i).Centroid(2);
+        pixels = CC.PixelIdxList{i};
+
+        % convert linear indices to coordinates
+        [y,x] = ind2sub(size(mask),pixels);
+
+        % centroid
+        cx = mean(x);
+        cy = mean(y);
 
         text(cx,cy,num2str(k), ...
             'HorizontalAlignment','center', ...
@@ -46,6 +53,7 @@ for k = 1:num_colors
     end
 end
 
+%% --- Draw palette circles ---
 for i = 1:num_colors
 
     x_center = i*spacing;
@@ -68,4 +76,3 @@ end
 
 title('Paint-by-Numbers Template')
 hold off
-end
