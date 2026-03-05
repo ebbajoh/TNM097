@@ -25,7 +25,7 @@ figure
 imshow(canvas)
 hold on
 
-%% --- Draw numbers inside regions ---
+% Draw numbers inside regions 
 for k = 1:num_colors
 
     mask = label_map == k;
@@ -53,7 +53,7 @@ for k = 1:num_colors
     end
 end
 
-%% --- Draw palette circles ---
+%Draw palette circles 
 for i = 1:num_colors
 
     x_center = i*spacing;
