@@ -1,7 +1,7 @@
 clear; close all; 
 
 % read img
-img = im2double(imread('img/Ariana.jpg'));
+img = im2double(imread('img/norrköping.jpg'));
 
 % smoothing (reduces texture noise)
 img = imgaussfilt(img, 2);
